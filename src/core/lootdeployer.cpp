@@ -159,6 +159,7 @@ std::unordered_set<int> LootDeployer::getModConflicts(int mod_id,
 
 void LootDeployer::sortModsByConflicts(std::optional<ProgressNode*> progress_node)
 {
+  log_(Log::LOG_INFO,"LOOT: Started sortModsByConflicts");
   if(progress_node)
   {
     (*progress_node)->addChildren({ 1, 2, 5, 0.2f });
@@ -181,14 +182,14 @@ void LootDeployer::sortModsByConflicts(std::optional<ProgressNode*> progress_nod
                              (dest_path_ / config_file_name_).string() + "'.");
   auto loot_handle = loot::CreateGameHandle(app_type_, source_path_, dest_path_);
   sfs::path user_list_path(dest_path_ / "userlist.yaml");
-  if(!sfs::exists(user_list_path))
-    user_list_path = "";
+  if(sfs::exists(user_list_path))
+    loot_handle->GetDatabase().LoadUserlist(user_list_path);
   sfs::path prelude_path(dest_path_ / "prelude.yaml");
-  if(!sfs::exists(prelude_path))
-    prelude_path = "";
-  loot_handle->GetDatabase().LoadMasterlistWithPrelude(master_list_path,
-                                                       prelude_path);
-  loot_handle->GetDatabase().LoadUserlist(user_list_path);
+  if (sfs::exists(prelude_path))
+    loot_handle->GetDatabase().LoadMasterlistWithPrelude(master_list_path,
+                                                         prelude_path);
+  else
+    loot_handle->GetDatabase().LoadMasterlist(master_list_path);
   if(progress_node)
     (*progress_node)->child(1).advance();
 
