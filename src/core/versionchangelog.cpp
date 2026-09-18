@@ -1,6 +1,8 @@
 #include "versionchangelog.h"
 #include <algorithm>
 #include <chrono>
+#include <iomanip>
+#include <sstream>
 
 
 VersionChangelog::VersionChangelog(const Json::Value& json)
